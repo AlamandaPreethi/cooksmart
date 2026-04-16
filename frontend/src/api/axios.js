@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+// Use relative /api/ in production (Nginx proxies to backend)
+// Use localhost:5000 in local dev via VITE_API_URL env variable
 const instance = axios.create({
-    baseURL: 'http://localhost:5000/api/'
+    baseURL: import.meta.env.VITE_API_URL || '/api/'
 });
 
 instance.interceptors.request.use(
