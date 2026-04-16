@@ -1,0 +1,29 @@
+{
+  "Spring": [
+    "Spring Matcha Latte",
+    "Lavender Lemonade",
+    "Berry Hibiscus Refresher",
+    "Cherry Blossom Soda"
+  ],
+  "Summer": [
+    "Mango Lassi",
+    "Watermelon Mint Cooler",
+    "Piña Colada Sparkler",
+    "Iced Strawberry Lemonade",
+    "Cucumber Mint Fizz"
+  ],
+  "Autumn": [
+    "Hot Spiced Apple Cider",
+    "Pumpkin Spice Steamer",
+    "Almond Maple Steamer"
+  ],
+  "Winter": [
+    "Winter Peppermint Cocoa",
+    "Golden Turmeric Milk",
+    "Hot Dark Chocolate"
+  ],
+  "All": [
+    "Masala Chai",
+    "Instant Protein Coffee"
+  ]
+}

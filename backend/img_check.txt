@@ -1,0 +1,26 @@
+OK 200 Paneer Tikka Masala
+OK 200 Butter Chicken
+OK 200 Mutton Rogan Josh
+OK 200 Chicken Biryani
+OK 200 Spring Matcha Latte
+OK 200 Lavender Lemonade
+OK 200 Berry Hibiscus Refresher
+OK 200 Cherry Blossom Soda
+OK 200 Mango Lassi
+OK 200 Watermelon Mint Cooler
+OK 200 Pina Colada Sparkler
+FAIL 404 Iced Strawberry Lemonade
+OK 200 Cucumber Mint Fizz
+OK 200 Hot Spiced Apple Cider
+OK 200 Pumpkin Spice Steamer
+OK 200 Almond Maple Steamer
+FAIL 404 Winter Peppermint Cocoa
+FAIL 404 Golden Turmeric Milk
+OK 200 Hot Dark Chocolate
+FAIL 404 Masala Chai
+OK 200 Instant Protein Coffee
+OK 200 Classic Avocado Toast
+OK 200 Greek Yogurt Parfait
+OK 200 Spicy Ramen
+Pass: 20/24
+FAIL: Iced Strawberry Lemonade, Winter Peppermint Cocoa, Golden Turmeric Milk, Masala Chai

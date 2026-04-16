@@ -1,0 +1,77 @@
+Food: Classic Tomato Basil Pasta
+Food: Chicken Stir Fry
+Food: Simple Omelette
+Food: Caprese Salad
+Food: Avocado Toast with Egg
+Food: Garlic Butter Shrimp
+Drink: Iced Lemon Tea
+Drink: Watermelon Mint Cooler
+Drink: Mango Lassi Delight
+Drink: Piña Colada Sparkler
+Drink: Strawberry Basil Lemonade
+Drink: Cucumber Mint Fizz
+Drink: Peach Berry Smoothie
+Drink: Classic Mojito Mocktail
+Drink: Pineapple Mint Slush
+Drink: Blueberry Lemon Spritz
+Drink: Kiwi Green Tea Iced
+Drink: Coconut Lime Cooler
+Drink: Summer Berry Punch
+Drink: Spiced Masala Chai
+Drink: Hot Dark Chocolate
+Drink: Cinnamon Apple Cider
+Drink: Vanilla Caramel Latte
+Drink: Ginger Honey Soother
+Drink: Peppermint Hot Cocoa
+Drink: Golden Turmeric Milk
+Drink: Spiced Pumpkin Steamer
+Drink: Hot Cranberry Punch
+Drink: Almond Maple Steamer
+Drink: Spicy Chai Latte
+Drink: Hot Vanilla Soy Milk
+Drink: Roasted Nut Cocoa
+Drink: Berry Hibiscus Refresher
+Drink: Lavender Lemonade
+Drink: Green Matcha Fizz
+Drink: Peach Blossomer
+Drink: Cucumber Lime Spritz
+Drink: Rose Petal Iced Tea
+Drink: Pineapple Sage Aqua
+Drink: Cherry Blossom Soda
+Drink: Apricot Mint Cooler
+Drink: Melon Medley Juice
+Drink: Golden Hour Refresher
+Drink: Pear Vanilla Fizz
+Drink: Spiced Hot Cider
+Drink: Pumpkin Spice Latte
+Drink: Pomegranate Spritz
+Drink: Warm Pear Nectar
+Drink: Maple Pecan Coffee
+Drink: Spiced Plum Smash
+Drink: Cranberry Thyme Soda
+Drink: Caramel Apple Fizz
+Drink: Cardamom Coffee
+Drink: Warm Blackberry Bramble
+Drink: Hazelnut Hot Milk
+Drink: Mulled Grape Juice
+Drink: Instant Protein Coffee
+Food: Greek Yogurt Parfait
+Drink: Iced Strawberry Lemonade
+Drink: Hot Spiced Apple Cider
+Drink: Winter Peppermint Cocoa
+Drink: Spring Matcha Latte
+Food: Classic Avocado Toast
+Drink: Instant Protein Coffee
+Food: Greek Yogurt Parfait
+Drink: Iced Strawberry Lemonade
+Drink: Hot Spiced Apple Cider
+Drink: Winter Peppermint Cocoa
+Drink: Spring Matcha Latte
+Food: Classic Avocado Toast
+Drink: Instant Protein Coffee
+Food: Greek Yogurt Parfait
+Drink: Iced Strawberry Lemonade
+Drink: Hot Spiced Apple Cider
+Drink: Winter Peppermint Cocoa
+Drink: Spring Matcha Latte
+Food: Classic Avocado Toast
