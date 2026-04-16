@@ -20,9 +20,10 @@ echo "=============================================="
 echo ""
 
 # ── STEP 1: System update ────────────────────────────────────
-echo ">>> [1/7] Updating system packages..."
+echo ">>> [1/7] Updating system packages and installing git..."
 sudo dnf update -y 2>/dev/null || sudo yum update -y
-echo "    System updated  ✓"
+sudo dnf install -y git 2>/dev/null || sudo yum install -y git
+echo "    System updated + git installed  ✓"
 
 # ── STEP 2: Install Node.js 20 via NVM ──────────────────────
 echo ""
