@@ -1,48 +1,83 @@
 #!/bin/bash
 # ============================================================
-#  CookSmart — Full EC2 Deployment Script
+#  CookSmart — EC2 Deployment Script (Amazon Linux)
 #  EC2 Public IP : 13.49.244.218
 #  GitHub Repo   : https://github.com/AlamandaPreethi/cooksmart
+#  User          : ec2-user (Amazon Linux)
 # ============================================================
-set -e   # stop on first error
+set -e
 
 EC2_IP="13.49.244.218"
 REPO="https://github.com/AlamandaPreethi/cooksmart.git"
-APP_DIR="$HOME/app"
+APP_DIR="/home/ec2-user/app"
+WHOAMI=$(whoami)
 
 echo ""
 echo "=============================================="
-echo "  CookSmart — EC2 Auto-Deployment Starting"
+echo "  CookSmart — EC2 Deployment (Amazon Linux)"
+echo "  Running as: $WHOAMI"
 echo "=============================================="
 echo ""
 
-# ── STEP 1: System update & install Node.js 20 LTS ──────────
-echo ">>> [1/7] Updating system and installing Node.js 20..."
-sudo apt-get update -y && sudo apt-get upgrade -y
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs nginx git
+# ── STEP 1: System update ────────────────────────────────────
+echo ">>> [1/7] Updating system packages..."
+sudo dnf update -y 2>/dev/null || sudo yum update -y
+echo "    System updated  ✓"
+
+# ── STEP 2: Install Node.js 20 via NVM ──────────────────────
+echo ""
+echo ">>> [2/7] Installing Node.js 20 via NVM..."
+
+# Install NVM
+export NVM_DIR="$HOME/.nvm"
+if [ ! -d "$NVM_DIR" ]; then
+  curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+fi
+
+# Load NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Install Node.js 20
+nvm install 20
+nvm use 20
+nvm alias default 20
+
+# Make node/npm available system-wide for PM2/Nginx
+NODE_PATH=$(which node)
+NPM_PATH=$(which npm)
+sudo ln -sf "$NODE_PATH" /usr/local/bin/node 2>/dev/null || true
+sudo ln -sf "$NPM_PATH" /usr/local/bin/npm 2>/dev/null || true
+
 echo "    Node $(node -v)  |  npm $(npm -v)  ✓"
 
-# ── STEP 2: Install PM2 globally ────────────────────────────
+# ── STEP 3: Install PM2 globally ─────────────────────────────
 echo ""
-echo ">>> [2/7] Installing PM2..."
-sudo npm install -g pm2
-echo "    PM2 $(pm2 -v)  ✓"
+echo ">>> [3/7] Installing PM2 and Nginx..."
+npm install -g pm2
 
-# ── STEP 3: Clone repo ──────────────────────────────────────
+# Install Nginx
+sudo dnf install -y nginx 2>/dev/null || sudo yum install -y nginx
+sudo systemctl enable nginx
+sudo systemctl start nginx
+
+echo "    PM2 and Nginx installed  ✓"
+
+# ── STEP 4: Clone / update repo ──────────────────────────────
 echo ""
-echo ">>> [3/7] Cloning repository..."
+echo ">>> [4/7] Cloning repository..."
 if [ -d "$APP_DIR" ]; then
-  echo "    Directory exists — pulling latest changes..."
+  echo "    Existing app found — pulling latest changes..."
   cd "$APP_DIR" && git pull origin main
 else
   git clone "$REPO" "$APP_DIR"
 fi
-echo "    Repo cloned to $APP_DIR  ✓"
+echo "    Repo ready at $APP_DIR  ✓"
 
-# ── STEP 4: Backend setup ────────────────────────────────────
+# ── STEP 5: Backend setup ─────────────────────────────────────
 echo ""
-echo ">>> [4/7] Setting up backend..."
+echo ">>> [5/7] Setting up backend..."
 cd "$APP_DIR/backend"
 npm install
 
@@ -56,28 +91,28 @@ ENVEOF
 
 echo "    .env created  ✓"
 
-# Kill existing backend on port 5000 if any
-echo "    Checking for existing process on port 5000..."
-fuser -k 5000/tcp 2>/dev/null || true
+# Kill any existing process on port 5000
+sudo fuser -k 5000/tcp 2>/dev/null || true
 
-# Start / restart with PM2
+# Start backend with PM2
 pm2 delete backend 2>/dev/null || true
 pm2 start server.js --name "backend"
+pm2 save
 echo "    Backend started with PM2  ✓"
 
-# ── STEP 5: Frontend build ───────────────────────────────────
+# ── STEP 6: Frontend build ────────────────────────────────────
 echo ""
-echo ">>> [5/7] Building frontend..."
+echo ">>> [6/7] Building frontend (Vite)..."
 cd "$APP_DIR/frontend"
 npm install
 npm run build
 echo "    Frontend built to $APP_DIR/frontend/dist  ✓"
 
-# ── STEP 6: Nginx config ─────────────────────────────────────
+# ── STEP 7: Configure Nginx ───────────────────────────────────
 echo ""
-echo ">>> [6/7] Configuring Nginx..."
+echo ">>> [7/7] Configuring Nginx..."
 
-sudo tee /etc/nginx/sites-available/cooksmart > /dev/null << NGINXEOF
+sudo tee /etc/nginx/conf.d/cooksmart.conf > /dev/null << NGINXEOF
 server {
     listen 80;
     server_name $EC2_IP;
@@ -90,7 +125,7 @@ server {
         try_files \$uri \$uri/ /index.html;
     }
 
-    # Reverse proxy API calls to Node.js backend
+    # Reverse proxy — API calls to Node.js on port 5000
     location /api/ {
         proxy_pass http://localhost:5000;
         proxy_http_version 1.1;
@@ -103,52 +138,51 @@ server {
         proxy_cache_bypass \$http_upgrade;
     }
 
-    # Gzip
     gzip on;
     gzip_types text/plain text/css application/json application/javascript text/xml;
 }
 NGINXEOF
 
-# Enable site, remove default
-sudo ln -sf /etc/nginx/sites-available/cooksmart /etc/nginx/sites-enabled/
-sudo rm -f /etc/nginx/sites-enabled/default
+# Remove default Nginx page (Amazon Linux location)
+sudo rm -f /etc/nginx/conf.d/welcome.conf 2>/dev/null || true
 
-# Fix permissions so Nginx can read the dist folder
+# Fix permissions
 sudo chmod -R 755 "$APP_DIR/frontend/dist"
-sudo chmod 755 "$HOME"
+sudo chmod 755 /home/ec2-user
 
 # Test and reload Nginx
 sudo nginx -t
 sudo systemctl reload nginx
-sudo systemctl enable nginx
-echo "    Nginx configured and running  ✓"
+echo "    Nginx configured  ✓"
 
-# ── STEP 7: PM2 auto-start on reboot ────────────────────────
+# ── PM2 startup on reboot ─────────────────────────────────────
 echo ""
-echo ">>> [7/7] Setting up PM2 auto-start on reboot..."
+echo ">>> Setting up PM2 auto-start on reboot..."
 pm2 save
-pm2 startup systemd -u ubuntu --hp /home/ubuntu | tail -1 | sudo bash
+# Generate startup command and run it
+PM2_STARTUP=$(pm2 startup systemd -u ec2-user --hp /home/ec2-user | grep "sudo env")
+if [ -n "$PM2_STARTUP" ]; then
+  eval "$PM2_STARTUP"
+fi
 pm2 save
-echo "    PM2 startup configured  ✓"
+echo "    PM2 auto-start configured  ✓"
 
-# ── Final status ─────────────────────────────────────────────
+# ── Final status ──────────────────────────────────────────────
 echo ""
 echo "=============================================="
 echo "  ✅  DEPLOYMENT COMPLETE!"
 echo "=============================================="
 echo ""
-echo "  🌐 Your App:  http://$EC2_IP"
-echo "  🔌 API:       http://$EC2_IP/api/"
+echo "  🌐 Your App : http://$EC2_IP"
+echo "  🔌 API      : http://$EC2_IP/api/"
 echo ""
-echo "  PM2 Status:"
+echo "  PM2 Processes:"
 pm2 status
 echo ""
-echo "  Nginx Status:"
-sudo systemctl is-active nginx
+echo "  Nginx Status: $(sudo systemctl is-active nginx)"
 echo ""
-echo "  Quick API test:"
 sleep 2
-curl -s -o /dev/null -w "  Backend HTTP status: %{http_code}\n" http://localhost:5000/api/auth/ || echo "  (route may need auth — that's OK)"
+curl -s -o /dev/null -w "  Backend health: HTTP %{http_code}\n" http://localhost:5000/ || true
 echo ""
-echo "  Open http://$EC2_IP in your browser!"
+echo "  👉 Open http://$EC2_IP in your browser!"
 echo "=============================================="
