@@ -32,6 +32,7 @@ exports.getRecipes = async (req, res) => {
 
         console.log("FINAL QUERY:", query);
         const recipes = await Recipe.find(query).sort({ createdAt: -1 });
+        console.log(`[DEBUG] /api/recipes fetched ${recipes.length} recipes.`);
         res.json(recipes);
     } catch (err) {
         console.error(err.message);
