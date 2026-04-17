@@ -1,28 +1,28 @@
 #!/bin/bash
 # ============================================================
-#  CookSmart — EC2 Deployment Script (Amazon Linux)
-#  EC2 Public IP : 13.49.244.218
+#  CookSmart — EC2 Deployment Script (Ubuntu)
+#  EC2 Public IP : 13.49.244.218 
 #  GitHub Repo   : https://github.com/AlamandaPreethi/cooksmart
-#  User          : ec2-user (Amazon Linux)
+#  User          : ubuntu (Ubuntu)
 # ============================================================
 set -e
 
-EC2_IP="13.49.244.218"
+EC2_IP="13.49.244.218" # UPDATE THIS IF YOUR AWS IP IS DIFFERENT
 REPO="https://github.com/AlamandaPreethi/cooksmart.git"
-APP_DIR="/home/ec2-user/app"
+APP_DIR="/home/ubuntu/app"
 WHOAMI=$(whoami)
 
 echo ""
 echo "=============================================="
-echo "  CookSmart — EC2 Deployment (Amazon Linux)"
+echo "  CookSmart — EC2 Deployment (Ubuntu)"
 echo "  Running as: $WHOAMI"
 echo "=============================================="
 echo ""
 
 # ── STEP 1: System update ────────────────────────────────────
 echo ">>> [1/7] Updating system packages and installing git..."
-sudo dnf update -y 2>/dev/null || sudo yum update -y
-sudo dnf install -y git 2>/dev/null || sudo yum install -y git
+sudo apt update -y
+sudo apt install -y git curl psmisc
 echo "    System updated + git installed  ✓"
 
 # ── STEP 2: Install Node.js 20 via NVM ──────────────────────
@@ -59,7 +59,7 @@ echo ">>> [3/7] Installing PM2 and Nginx..."
 npm install -g pm2
 
 # Install Nginx
-sudo dnf install -y nginx 2>/dev/null || sudo yum install -y nginx
+sudo apt install -y nginx
 sudo systemctl enable nginx
 sudo systemctl start nginx
 
@@ -144,12 +144,12 @@ server {
 }
 NGINXEOF
 
-# Remove default Nginx page (Amazon Linux location)
-sudo rm -f /etc/nginx/conf.d/welcome.conf 2>/dev/null || true
+# Remove default Nginx page (Ubuntu location)
+sudo rm -f /etc/nginx/sites-enabled/default 2>/dev/null || true
 
 # Fix permissions
 sudo chmod -R 755 "$APP_DIR/frontend/dist"
-sudo chmod 755 /home/ec2-user
+sudo chmod 755 /home/ubuntu
 
 # Test and reload Nginx
 sudo nginx -t
@@ -161,7 +161,7 @@ echo ""
 echo ">>> Setting up PM2 auto-start on reboot..."
 pm2 save
 # Generate startup command and run it
-PM2_STARTUP=$(pm2 startup systemd -u ec2-user --hp /home/ec2-user | grep "sudo env")
+PM2_STARTUP=$(pm2 startup systemd -u ubuntu --hp /home/ubuntu | grep "sudo env")
 if [ -n "$PM2_STARTUP" ]; then
   eval "$PM2_STARTUP"
 fi

@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-// Use relative /api/ in production (Nginx proxies to backend)
-// Use localhost:5000 in local dev via VITE_API_URL env variable
+// In a strict Render deployment (Separate Frontend/Backend), set VITE_API_URL
+// to your backend URL (e.g. https://your-backend.onrender.com/api)
+// If you are deploying them together (Frontend served by Backend Node.js process),
+// the fallback '/api/' will work natively in production without setting the env var.
 const instance = axios.create({
     baseURL: import.meta.env.VITE_API_URL || '/api/'
 });
