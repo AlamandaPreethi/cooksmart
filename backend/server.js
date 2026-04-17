@@ -31,8 +31,14 @@ app.use('/api/favorites', require('./routes/favoriteRoutes'));
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 // Fallback routing: send all unspecified routes to index.html
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend/dist', 'index.html'));
+// Express 5.x strictly prohibits app.get('*') so we use a wildcard middleware instead
+app.use((req, res, next) => {
+    // Only send the HTML fallback if they are requesting a typical GET
+    if (req.method === 'GET' && !req.path.startsWith('/api/')) {
+        res.sendFile(path.resolve(__dirname, '../frontend/dist', 'index.html'));
+    } else {
+        next();
+    }
 });
 
 const PORT = process.env.PORT || 5000;
